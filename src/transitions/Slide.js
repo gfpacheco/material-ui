@@ -14,19 +14,31 @@ const GUTTER = 24;
 // Later, we gonna translate back the element to his original location
 // with `translate3d(0, 0, 0)`.`
 function getTranslateValue(props, element: Element) {
-  const { direction } = props;
-  const rect = element.getBoundingClientRect();
+  const { offset, direction } = props;
+  let translateValue;
 
-  if (direction === 'left') {
-    return `translate3d(calc(100vw - ${rect.left}px), 0, 0)`;
-  } else if (direction === 'right') {
-    return `translate3d(${0 - (rect.left + rect.width + GUTTER)}px, 0, 0)`;
-  } else if (direction === 'up') {
-    return `translate3d(0, calc(100vh - ${rect.top}px), 0)`;
+  if (offset) {
+    translateValue = offset;
+  } else {
+    const rect = element.getBoundingClientRect();
+
+    if (direction === 'left') {
+      translateValue = `calc(100vw - ${rect.left}px)`;
+    } else if (direction === 'right') {
+      translateValue = `${0 - (rect.left + rect.width + GUTTER)}px`;
+    } else if (direction === 'up') {
+      translateValue = `calc(100vh - ${rect.top}px`;
+    } else {
+      // direction === 'down
+      translateValue = `${0 - (rect.top + rect.height)}px`;
+    }
   }
 
-  // direction === 'down
-  return `translate3d(0, ${0 - (rect.top + rect.height)}px, 0)`;
+  if (direction === 'left' || direction === 'right') {
+    return `translate3d(${translateValue}, 0, 0)`;
+  }
+
+  return `translate3d(0, ${translateValue}, 0)`;
 }
 
 type Direction = 'left' | 'right' | 'up' | 'down';
